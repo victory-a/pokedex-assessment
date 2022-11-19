@@ -19,6 +19,9 @@ interface PokemonContextData {
   filters: Filters
   addFilter: (field: Field, value: FilterValue) => void
   removeFilter: (field: Field) => void
+  populatePokemonType: (pokemonObject: PokemonTypeObject) => void;
+  selectedPokemonTypes: PokemonTypes[];
+  setSelectedPokemonTypes: React.Dispatch<React.SetStateAction<PokemonTypes[]>>;
 }
 
 export const PokemonContext = React.createContext<PokemonContextData | undefined>(undefined)
@@ -48,6 +51,9 @@ export enum PokemonType {
   water = "water",
 }
 
+type PokemonTypes = Partial<keyof typeof PokemonType>;
+export type PokemonTypeObject = Record<string, PokemonTypes[]>;
+
 export enum PokemonStat {
   hp = "hp",
   attack = "attack",
@@ -64,6 +70,8 @@ const PokemonProvider: React.FC<PokemonProviderProps> = ({ children }) => {
   const [query, setQuery] = useState<string>('')
   const [filters, setFilters] = useState<Filters>({} as Filters)
   const [error, setError] = useState<any>()
+  const [pokemonTypeStore, setPokemonTypeStore] = useState({} as PokemonTypeObject)
+  const [selectedPokemonTypes, setSelectedPokemonTypes] = React.useState<PokemonTypes[]>([])
 
   useEffect(() => {
     fetchPokemon()
@@ -146,6 +154,10 @@ const PokemonProvider: React.FC<PokemonProviderProps> = ({ children }) => {
     setFilters(newFilters)
   }
 
+  function populatePokemonType(pokemon: PokemonTypeObject) {
+    setPokemonTypeStore((currentValues) => ({ ...currentValues, ...pokemon }));
+  }
+
   if (error) {
     return <div>Error</div>
   }
@@ -164,7 +176,10 @@ const PokemonProvider: React.FC<PokemonProviderProps> = ({ children }) => {
       removeFavourite,
       filters,
       addFilter,
-      removeFilter
+      removeFilter,
+      populatePokemonType,
+      selectedPokemonTypes,
+      setSelectedPokemonTypes,
     }}>
       {children}
     </PokemonContext.Provider>

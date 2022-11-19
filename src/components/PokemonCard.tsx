@@ -1,5 +1,5 @@
 import { Box, Card, CardActionArea, CardHeader, CardContent, CardMedia, Skeleton, Fade, Dialog, ThemeProvider } from "@mui/material"
-import { PokemonStat, PokemonType } from "./Contexts/PokemonProvider"
+import { PokemonStat, PokemonType, usePokemonContext } from "./Contexts/PokemonProvider"
 import { useEffect, useRef, useState } from "react"
 import PokemonModal from "./PokemonModal";
 import { baseTheme, getTheme } from "../theme";
@@ -41,6 +41,7 @@ const PokemonCard: React.FC<PokemonCardProps> = ({
   const [description, setDescription] = useState<string>()
   const [evolutions, setEvolutions] = useState<IChainLink[]>()
   const ref = useRef<HTMLDivElement>(null)
+  const { populatePokemonType } = usePokemonContext();
 
   const name = pokemon.name[0].toUpperCase() + pokemon.name.slice(1)
   const id = getIdFromUrl(pokemon.url)
@@ -169,6 +170,11 @@ const PokemonCard: React.FC<PokemonCardProps> = ({
       })
       .finally(() => setLoading(false))
   }, [isVisible, pokemon.url])
+
+  useEffect(() => {
+    populatePokemonType({ [pokemon.name]: types})
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [types])
 
   function handleToggleFavourite() {
     if (isFavourite) {
