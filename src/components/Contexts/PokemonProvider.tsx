@@ -4,6 +4,7 @@ import { getIdFromUrl, isOG } from '../../utils'
 
 export enum Field {
   favourite = 'favourite',
+  pokemonType = 'pokemonType'
 }
 
 type Filters = { [key in Field]: FilterValue }
@@ -19,6 +20,7 @@ interface PokemonContextData {
   filters: Filters
   addFilter: (field: Field, value: FilterValue) => void
   removeFilter: (field: Field) => void
+  populatePokemonType: (pokemonObject: PokemonTypeObject) => void;
 }
 
 export const PokemonContext = React.createContext<PokemonContextData | undefined>(undefined)
@@ -28,25 +30,28 @@ interface PokemonProviderProps {
 }
 
 export enum PokemonType {
+  grass = "grass",
+  fire = "fire",
+  water = "water",
   bug = "bug",
+  normal = "normal",
+  flying = "flying",
   dark = "dark",
-  dragon = "dragon",
   electric = "electric",
+  dragon = "dragon",
+  poison = "poison",
   fairy = "fairy",
   fighting = "fighting",
-  fire = "fire",
-  flying = "flying",
   ghost = "ghost",
-  grass = "grass",
   ground = "ground",
   ice = "ice",
-  normal = "normal",
-  poison = "poison",
   psychic = "psychic",
   rock = "rock",
   steel = "steel",
-  water = "water",
 }
+
+type PokemonTypes = Partial<keyof typeof PokemonType>;
+export type PokemonTypeObject = Record<string, PokemonTypes[]>;
 
 export enum PokemonStat {
   hp = "hp",
@@ -64,6 +69,7 @@ const PokemonProvider: React.FC<PokemonProviderProps> = ({ children }) => {
   const [query, setQuery] = useState<string>('')
   const [filters, setFilters] = useState<Filters>({} as Filters)
   const [error, setError] = useState<any>()
+  const [pokemonTypeStore, setPokemonTypeStore] = useState({} as PokemonTypeObject)
 
   useEffect(() => {
     fetchPokemon()
@@ -80,7 +86,6 @@ const PokemonProvider: React.FC<PokemonProviderProps> = ({ children }) => {
 
     let filteredData = [...data]
     const fields = Object.keys(filters) as Field[]
-
     for (const field of fields) {
       switch (field) {
         case Field.favourite: {
@@ -91,6 +96,24 @@ const PokemonProvider: React.FC<PokemonProviderProps> = ({ children }) => {
             filteredData = filteredData.filter((pokemon) => !favourites.includes(pokemon.name))
           }
           break
+        }
+        case Field.pokemonType: {
+          const selectedTypes = filters[field];
+          if (!Array.isArray(selectedTypes)) break;
+
+          const store = new Set<INamedApiResource<IPokemon>>();
+
+          filteredData.forEach((data) => {
+            const availablePokemonTypeValues = pokemonTypeStore[data.name];
+            
+            if (availablePokemonTypeValues.length > 0) {
+              availablePokemonTypeValues.forEach((value) => {
+                if (selectedTypes.includes(value)) store.add(data);
+              });
+            }
+          });
+
+          filteredData = Array.from(store)
         }
       }
     }
@@ -146,6 +169,10 @@ const PokemonProvider: React.FC<PokemonProviderProps> = ({ children }) => {
     setFilters(newFilters)
   }
 
+  function populatePokemonType(pokemon: PokemonTypeObject) {
+    setPokemonTypeStore((currentValues) => ({ ...currentValues, ...pokemon }));
+  }
+
   if (error) {
     return <div>Error</div>
   }
@@ -164,7 +191,8 @@ const PokemonProvider: React.FC<PokemonProviderProps> = ({ children }) => {
       removeFavourite,
       filters,
       addFilter,
-      removeFilter
+      removeFilter,
+      populatePokemonType,
     }}>
       {children}
     </PokemonContext.Provider>

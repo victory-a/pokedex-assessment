@@ -3,6 +3,7 @@ import { Container, Grid, InputAdornment, TextField, Typography, Box, Button, Ic
 import PokemonCard from '../components/PokemonCard'
 import { Field, usePokemonContext } from '../components/Contexts/PokemonProvider'
 import { Search, FavoriteBorder, Favorite, Close } from '@mui/icons-material'
+import PokemonFilter from '../components/PokemonFilter'
 
 const Home: React.FC = () => {
   const {
@@ -69,7 +70,7 @@ const Home: React.FC = () => {
           My Favourites ({favourites.length})
         </Button>
       </Box>
-
+      <PokemonFilter />
       <Grid container spacing={2}>
         {pokemon.map((pokemon) => (
           <Grid
