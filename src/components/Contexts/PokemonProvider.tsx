@@ -1,6 +1,6 @@
 import React, { useContext, useEffect, useState } from 'react'
 import PokeAPI, { INamedApiResource, IPokemon } from 'pokeapi-typescript'
-import { getIdFromUrl, isOG } from '../../utils'
+import { getIdFromUrl } from '../../utils'
 
 export enum Field {
   favourite = 'favourite',

@@ -1,12 +1,11 @@
-import React, { useEffect } from 'react';
+import React from 'react';
 import InputLabel from '@mui/material/InputLabel';
 import MenuItem from '@mui/material/MenuItem';
 import FormControl from '@mui/material/FormControl';
 import ListItemText from '@mui/material/ListItemText';
 import Select, { SelectChangeEvent } from '@mui/material/Select';
 import Checkbox from '@mui/material/Checkbox';
-import { Search, FavoriteBorder, Favorite, Close } from '@mui/icons-material';
-import { Container, Grid, InputAdornment, TextField, Typography, Box, Button, IconButton } from '@mui/material';
+import { Container, Button } from '@mui/material';
 
 import { PokemonType, usePokemonContext, Field } from './Contexts/PokemonProvider';
 import PokemonTypeIcon from './PokemonTypeIcon';
@@ -28,7 +27,7 @@ const MenuProps = {
 function PokemonFilter() {
   const [selectedPokemonTypes, setSelectedPokemonTypes] = React.useState<PokemonTypes[]>([]);
 
-  const { addFilter, removeFilter, filters } = usePokemonContext();
+  const { addFilter, removeFilter } = usePokemonContext();
   const handleChange = (event: SelectChangeEvent<PokemonTypes[]>) => {
     const {
       target: { value },
